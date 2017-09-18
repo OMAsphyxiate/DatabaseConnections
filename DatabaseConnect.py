@@ -1,8 +1,6 @@
 import pyodbc, psycopg2, sys, sqlanydb
-#sys.path.insert(0, 'C:/Users/Christian/Desktop/GitHub/')
-#sys.path.insert(0, 'C:/Users/Reaper/Desktop/GitHub/')
 import Connect as ct
-
+from DatabaseSyncs import DBFunctions as dbf
 #class DatabaseSync:
 #	def __init__(noquery=None): #Initialze method
 #		if sql is None:
@@ -10,7 +8,24 @@ import Connect as ct
 #		else:
 #			noquery = sql
 noquery = "SELECT 'No Query'"
-		
+	
+def ESCheck():
+	for i in range(1,len(dbf.ClinicDict)+1):
+		host = dbf.ClinicDict[i]
+	try:
+	    esconn = sqlanydb.connect( #Establish Connection
+	        UID=ct.SAUID,
+	        PWD=ct.SAPWD,
+	        HOST=host,
+	        DBN=ct.SADatabase,
+	        ENG=ct.SAServer)
+	    escurs = esconn.cursor() #Create Cursor
+	    escurs.close() #Close Cursor
+	    esconn.close() #Close Connection
+	    return print("Clinic %s: Connection Success" % i)
+	except:
+	    return print("Could not connect to Clinic %s at HOST: %s" % (i,host))
+
 def ESGrab(host,query=None):
 	query = query or noquery #Use class query if no alternative
 	try:
